@@ -1,36 +1,46 @@
 import React, { useState, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom' // Changed from useHistory to useNavigate
 import Logo from '../../olx-logo.png'
 import {
   getAuth,
   createUserWithEmailAndPassword,
   updateProfile,
 } from 'firebase/auth'
+import { getFirestore, collection, addDoc } from 'firebase/firestore'
 import './Signup.css'
-import { FirebaseContext } from '../../store/FirebaseContext'
+
 export default function Signup() {
   const [userName, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
-  const { firebase } = useContext(FirebaseContext)
   const [phone, setPhone] = useState('')
+  const navigate = useNavigate() // Changed from useHistory
 
-  const handelSubmit = (e) => {
+  const handelSubmit = async (e) => {
     e.preventDefault()
-    const auth = getAuth()
+    try {
+      const auth = getAuth()
+      const db = getFirestore()
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        updateProfile(userCredential.user, {
-          displayName: userName,
-        }).then(() => {
-          // Profile updated successfully
-          console.log('User registered successfully!')
-        })
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      )
+      await updateProfile(userCredential.user, {
+        displayName: userName,
       })
-      .catch((error) => {
-        console.error(error.message)
+
+      await addDoc(collection(db, 'users'), {
+        id: userCredential.user.uid,
+        username: userName,
+        phone: phone,
       })
+
+      navigate('/login') // Changed from history.push to navigate
+    } catch (error) {
+      console.error('Error during signup:', error.message)
+    }
   }
 
   return (
