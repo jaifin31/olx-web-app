@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom' // Changed from useHistory to useNavigate
 import Logo from '../../olx-logo.png'
 import {
