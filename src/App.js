@@ -1,11 +1,16 @@
-import React from 'react'
+import React, { useEffect, useContext } from 'react'
 import './App.css'
 import Signup from './Pages/Signup'
 import Home from './Pages/Home'
 import Login from './Pages/Login'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { AuthContext } from './store/Context'
 
 function App() {
+  const { user } = useContext(AuthContext)
+  useEffect(() => {
+    console.log(user)
+  })
   return (
     <div>
       <Router>
