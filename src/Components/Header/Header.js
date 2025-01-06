@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { getAuth, signOut } from 'firebase/auth'
+import './Header.css'
+import OlxLogo from '../../assets/OlxLogo'
+import Search from '../../assets/Search'
+import Arrow from '../../assets/Arrow'
+import SellButton from '../../assets/SellButton'
+import SellButtonPlus from '../../assets/SellButtonPlus'
+import { AuthContext } from '../../store/Context'
 
-import './Header.css';
-import OlxLogo from '../../assets/OlxLogo';
-import Search from '../../assets/Search';
-import Arrow from '../../assets/Arrow';
-import SellButton from '../../assets/SellButton';
-import SellButtonPlus from '../../assets/SellButtonPlus';
 function Header() {
+  const { user, setUser } = useContext(AuthContext)
+  const navigate = useNavigate()
+  
+  const handleLogout = () => {
+    const auth = getAuth()
+    signOut(auth).then(() => {
+      setUser(null)
+      navigate('/login')
+    }).catch((error) => {
+      console.error('Logout error:', error)
+    })
+  }
+
   return (
     <div className="headerParentDiv">
       <div className="headerChildDiv">
@@ -34,10 +50,14 @@ function Header() {
           <Arrow></Arrow>
         </div>
         <div className="loginPage">
-          <span>Login</span>
-          <hr />
+          <span>{user ? `Welcome ${user.displayName}` : 'Login'}</span>
+      
+          {user && (
+            <span onClick={handleLogout} className="logout-span">
+              Logout
+            </span>
+          )}
         </div>
-
         <div className="sellMenu">
           <SellButton></SellButton>
           <div className="sellMenuContent">
@@ -47,7 +67,7 @@ function Header() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default Header;
+export default Header

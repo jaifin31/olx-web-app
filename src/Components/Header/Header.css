@@ -136,6 +136,23 @@
 .sellMenu .right {
   fill: #3a77ff;
 }
+
+.logout-span {
+  cursor: pointer;
+  color: black;
+  padding: 5px;
+  margin-left: 30px;
+}
+
+.logout-span:hover {
+  color: rgb(125, 0, 0);
+  text-decoration: underline;
+}
+
+.loginPage {
+  position: relative;
+  cursor: pointer;
+}
 .sellMenu .sellMenuContent {
   display: flex;
   position: absolute;
