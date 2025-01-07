@@ -1,12 +1,17 @@
+// Posts.jsx
 import React, { useEffect, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import Heart from '../../assets/Heart';
 import './Post.css';
 import { FirebaseContext } from '../../store/Context';
+import { PostContext } from '../../store/PostContext';  // Add this import
 
 function Posts() {
   const { firebase } = useContext(FirebaseContext);
+  const { setPostDetails } = useContext(PostContext);  // Get PostContext
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -14,20 +19,22 @@ function Posts() {
         const db = getFirestore(firebase);
         const productsCollection = collection(db, 'products');
         const snapshot = await getDocs(productsCollection);
-        
         const allProducts = snapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }));
-        
         setProducts(allProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
     };
-
     fetchProducts();
   }, [firebase]);
+
+  const handleCardClick = (product) => {
+    setPostDetails(product);
+    navigate('/viewpost');
+  };
 
   return (
     <div className="postParentDiv">
@@ -38,7 +45,11 @@ function Posts() {
         </div>
         <div className="cards">
           {products.map((product) => (
-            <div className="card" key={product.id}>
+            <div
+              onClick={() => handleCardClick(product)}
+              className="card"
+              key={product.id}
+            >
               <div className="favorite">
                 <Heart />
               </div>
@@ -55,30 +66,6 @@ function Posts() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-      <div className="recommendations">
-        <div className="heading">
-          <span>Fresh recommendations</span>
-        </div>
-        <div className="cards">
-          {/* You might want to map through recommended products here instead of hardcoding */}
-          <div className="card">
-            <div className="favorite">
-              <Heart />
-            </div>
-            <div className="image">
-              <img src="../../../Images/R15V3.jpg" alt="YAMAHA R15V3" />
-            </div>
-            <div className="content">
-              <p className="rate">&#x20B9; 250000</p>
-              <span className="kilometer">Two Wheeler</span>
-              <p className="name">YAMAHA R15V3</p>
-            </div>
-            <div className="date">
-              <span>10/5/2021</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
