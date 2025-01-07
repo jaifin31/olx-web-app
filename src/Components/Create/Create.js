@@ -1,21 +1,32 @@
-// Updated Create.js component
 import React, { Fragment, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Create.css';
 import Header from '../Header/Header';
 import { FirebaseContext, AuthContext } from '../../store/Context';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { AdvancedImage } from '@cloudinary/react';
+import { fill } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
 
 const Create = () => {
+  const navigate = useNavigate();
   const { firebase } = useContext(FirebaseContext);
   const { user } = useContext(AuthContext);
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [uploadedImageId, setUploadedImageId] = useState(null);
   const date = new Date();
+
+  // Initialize Cloudinary
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: 'dpdmojqn9'
+    }
+  });
 
   const handleSubmit = async () => {
     if (!user) {
@@ -30,64 +41,68 @@ const Create = () => {
 
     try {
       setLoading(true);
-      const storage = getStorage(firebase);
-      const db = getFirestore(firebase);
 
-      // Create a unique filename
-      const fileName = `${Date.now()}-${image.name}`;
-      const storageRef = ref(storage, `images/${fileName}`);
+      // Create form data for Cloudinary upload
+      const formData = new FormData();
+      formData.append('file', image);
+      formData.append('upload_preset', 'be5eowjr');
 
-      // Create upload task
-      const uploadTask = uploadBytesResumable(storageRef, image);
-
-      // Monitor upload progress
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        },
-        (error) => {
-          console.error('Upload error:', error);
-          alert('Error uploading image. Please try again.');
-          setLoading(false);
-        },
-        async () => {
-          try {
-            // Get download URL after successful upload
-            const url = await getDownloadURL(uploadTask.snapshot.ref);
-
-            // Add to Firestore
-            await addDoc(collection(db, 'products'), {
-              name,
-              category,
-              price,
-              url,
-              userId: user.uid,
-              createdAt: date.toDateString()
-            });
-
-            // Reset form
-            setName('');
-            setCategory('');
-            setPrice('');
-            setImage(null);
-            setUploadProgress(0);
-            setLoading(false);
-            
-            alert('Product uploaded successfully!');
-          } catch (error) {
-            console.error('Firestore error:', error);
-            alert('Error saving product details. Please try again.');
-            setLoading(false);
-          }
+      // Upload to Cloudinary
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/dpdmojqn9/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
         }
       );
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
+      // Store the public_id for the uploaded image
+      setUploadedImageId(data.public_id);
+
+      // Save product details to Firestore
+      const db = getFirestore(firebase);
+      await addDoc(collection(db, 'products'), {
+        name,
+        category,
+        price,
+        url: data.secure_url,
+        imageId: data.public_id,
+        userId: user.uid,
+        createdAt: date.toDateString()
+      });
+
+      // Reset form
+      setName('');
+      setCategory('');
+      setPrice('');
+      setImage(null);
+      setUploadedImageId(null);
+      setLoading(false);
+      
+      alert('Product uploaded successfully!');
+      // Redirect to home page
+      navigate('/');
+
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred. Please try again.');
+      alert('Error uploading product. Please try again.');
       setLoading(false);
     }
+  };
+
+  // Rest of the component remains the same...
+  const getPreviewImage = (publicId) => {
+    return cld
+      .image(publicId)
+      .format('auto')
+      .quality('auto')
+      .resize(fill().gravity(autoGravity()).width(200).height(200));
   };
 
   return (
@@ -132,7 +147,12 @@ const Create = () => {
           />
           <br />
           <br />
-          {image && (
+          {uploadedImageId ? (
+            <AdvancedImage 
+              cldImg={getPreviewImage(uploadedImageId)} 
+              alt="Preview" 
+            />
+          ) : image && (
             <img
               alt="Preview"
               width="200px"
@@ -147,16 +167,6 @@ const Create = () => {
             accept="image/*"
             disabled={loading}
           />
-          {uploadProgress > 0 && uploadProgress < 100 && (
-            <div className="progress">
-              <div 
-                className="progress-bar" 
-                style={{ width: `${uploadProgress}%` }}
-              >
-                {Math.round(uploadProgress)}%
-              </div>
-            </div>
-          )}
           <br />
           <button
             onClick={handleSubmit}

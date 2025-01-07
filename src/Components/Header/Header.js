@@ -12,15 +12,20 @@ import { AuthContext } from '../../store/Context'
 function Header() {
   const { user, setUser } = useContext(AuthContext)
   const navigate = useNavigate()
-  
+
   const handleLogout = () => {
     const auth = getAuth()
-    signOut(auth).then(() => {
-      setUser(null)
-      navigate('/login')
-    }).catch((error) => {
-      console.error('Logout error:', error)
-    })
+    signOut(auth)
+      .then(() => {
+        setUser(null)
+        navigate('/login')
+      })
+      .catch((error) => {
+        console.error('Logout error:', error)
+      })
+  }
+  const handleLoginClick = () => {
+    navigate('/login')
   }
 
   return (
@@ -49,12 +54,30 @@ function Header() {
           <span> ENGLISH </span>
           <Arrow></Arrow>
         </div>
-        <div className="loginPage">
+        {/* <div className="loginPage">
           <span>{user ? `Welcome ${user.displayName}` : 'Login'}</span>
       
           {user && (
             <span onClick={handleLogout} className="logout-span">
               Logout
+            </span>
+          )}
+        </div> */}
+        <div className="loginPage">
+          {user ? (
+            <>
+              <span>Welcome {user.displayName}</span>
+              <span
+                onClick={handleLogout}
+              >
+                Logout
+              </span>
+            </>
+          ) : (
+            <span
+              onClick={handleLoginClick}
+            >
+              Login
             </span>
           )}
         </div>
