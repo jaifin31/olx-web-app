@@ -27,6 +27,13 @@ function Header() {
   const handleLoginClick = () => {
     navigate('/login')
   }
+  const handleSaleClick = () => {
+    if (user) {
+      navigate('/create')
+    } else {
+      navigate('/login')
+    }
+  }
 
   return (
     <div className="headerParentDiv">
@@ -67,25 +74,17 @@ function Header() {
           {user ? (
             <>
               <span>Welcome {user.displayName}</span>
-              <span
-                onClick={handleLogout}
-              >
-                Logout
-              </span>
+              <span onClick={handleLogout}>Logout</span>
             </>
           ) : (
-            <span
-              onClick={handleLoginClick}
-            >
-              Login
-            </span>
+            <span onClick={handleLoginClick}>Login</span>
           )}
         </div>
         <div className="sellMenu">
           <SellButton></SellButton>
           <div className="sellMenuContent">
             <SellButtonPlus></SellButtonPlus>
-            <span>SELL</span>
+            <span onClick={handleSaleClick}>SELL</span>
           </div>
         </div>
       </div>

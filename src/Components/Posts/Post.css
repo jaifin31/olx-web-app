@@ -1,87 +1,199 @@
+.postParentDiv {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
 .moreView {
-  margin: 16px 16px 24px;
-  padding: 16px 16px 32px;
-  background-color: #ebeeef;
-  border-radius: 4px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin: 24px 0;
+  padding: 24px;
 }
 
 .heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
 }
+
 .heading :first-child {
   font-size: 24px;
   color: #002f34;
+  font-weight: 600;
 }
 
 .heading :last-child {
   font-size: 14px;
   color: #002f34;
-}
-
-.recommendations .cards {
-  display: flex;
-}
-
-.moreView .cards {
-  white-space: nowrap;
-  overflow-x: scroll;
-  overflow-y: hidden;
-}
-
-.card {
-  margin-right: 15px;
-  padding: 13px;
-  max-width: 222px;
-  width: 222px;
-  height: 270px;
-  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background-color: #ebeeef;
+  transition: background-color 0.2s;
   cursor: pointer;
 }
 
-.card .favorite {
+.heading :last-child:hover {
+  background-color: #dce1e2;
+}
+
+.moreView .cards {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  overflow-x: auto;
+  gap: 20px;
+  padding: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #002f34 #ebeeef;
+}
+
+/* Custom scrollbar styles */
+.moreView .cards::-webkit-scrollbar {
+  height: 6px;
+}
+
+.moreView .cards::-webkit-scrollbar-track {
+  background: #ebeeef;
+  border-radius: 10px;
+}
+
+.moreView .cards::-webkit-scrollbar-thumb {
+  background: #002f34;
+  border-radius: 10px;
+}
+
+.card {
+  flex: 0 0 auto;
+  width: 280px;
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #ebeeef;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card .favorite {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.card .favorite:hover {
+  transform: scale(1.1);
 }
 
 .card .image {
+  height: 180px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #f8f9fa;
 }
 
 .card .image img {
-  height: 100px;
-  max-width: 100%;
-  max-height: 100%;
-  min-height: 100%;
-  text-align: center;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
 }
-.card .content .rate {
-  margin-top: 10px;
-  font-size: larger;
-  font-weight: bold;
+
+.card:hover .image img {
+  transform: scale(1.05);
 }
-.card .content .kilometer {
-  font-size: medium;
-}
-.card .content .name {
-  font-size: small;
-}
-.card .date {
+
+.card .content {
+  flex-grow: 1;
   display: flex;
-  justify-content: flex-end;
-  font-size: small;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card .content .rate {
+  font-size: 20px;
+  font-weight: 600;
+  color: #002f34;
+  margin: 0;
+}
+
+.card .content .kilometer {
+  font-size: 14px;
+  color: #666;
+  background-color: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.card .content .name {
+  font-size: 16px;
+  color: #002f34;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card .date {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #666;
 }
 
 .recommendations {
-  margin: 16px 16px 24px;
+  margin: 32px 0;
+}
+
+.recommendations .heading {
+  margin-bottom: 24px;
 }
 
 .recommendations .heading span {
   font-size: 24px;
   color: #002f34;
+  font-weight: 600;
+}
+
+.recommendations .cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 4px;
+}
+
+@media (max-width: 768px) {
+  .postParentDiv {
+    padding: 16px;
+  }
+  
+  .card {
+    width: 240px;
+  }
+  
+  .card .image {
+    height: 140px;
+  }
+  
+  .heading :first-child {
+    font-size: 20px;
+  }
 }
