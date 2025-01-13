@@ -45,7 +45,7 @@ const Create = () => {
       // Create form data for Cloudinary upload
       const formData = new FormData();
       formData.append('file', image);
-      formData.append('upload_preset', 'be5eowjr');
+      formData.append('upload_preset', '');
 
       // Upload to Cloudinary
       const response = await fetch(
